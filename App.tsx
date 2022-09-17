@@ -3,14 +3,13 @@ import {
   Alert,
   Button,
   FlatList,
-  processColor,
   StyleSheet,
   Text,
   TextInput,
   View,
 } from 'react-native';
 import { initializeApp } from 'firebase/app';
-import { getFirestore, collection, addDoc, getDocs, setDoc, doc, updateDoc } from "firebase/firestore";
+import { getFirestore, collection, getDocs, setDoc, doc, updateDoc, deleteDoc } from "firebase/firestore";
 import TaskEditModal from './components/TaskEditModal';
 
 const App = () => {
@@ -88,11 +87,20 @@ const App = () => {
     });
 
   }
-  const handleDeleteTask = (index: any) => {
+  const handleDeleteTask = async (index: any) => {
     setModalVisible(!modalVisible)
-    let temp = [...tasks]
-    temp.splice(index, 1);
-    setTasks(temp)
+
+    //finding the index to facilitate deletion
+    let obj = tasks.find((o: any) => o.id == index);
+    const tempIndex = tasks.indexOf(obj);
+
+    //deleting the data locally
+    let tempArray = [...tasks]
+    tempArray.splice(tempIndex, 1);
+    setTasks(tempArray)
+
+    //deleting the data from databse
+    await deleteDoc(doc(db, dbname, index.toString()));
   }
 
   return (
