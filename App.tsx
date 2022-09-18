@@ -11,6 +11,7 @@ import {
 import { initializeApp } from 'firebase/app';
 import { getFirestore, collection, getDocs, setDoc, doc, updateDoc, deleteDoc } from "firebase/firestore";
 import TaskEditModal from './components/TaskEditModal';
+import { useFetchTaskDetails } from './components/Custom Hooks/useFetchTaskDetails';
 
 const App = () => {
   const [tasks, setTasks] = useState<any>([])
@@ -75,13 +76,12 @@ const App = () => {
   const handleUpdatedTask = async (updatedTask: string, index: any) => {
     setModalVisible(!modalVisible)
 
-    let obj = tasks.find((o: any) => o.id == index);
-    const tempIndex = tasks.indexOf(obj);
+    const {tempArray} = useFetchTaskDetails(tasks, index).updateOperation(updatedTask)
 
-    let tempArray = [...tasks]
-    tempArray[tempIndex] = { task: updatedTask, id: index }
+    //updating the list in the app
     setTasks(tempArray)
 
+    //updating the data in the databse
     await updateDoc(doc(db, dbname, index.toString()), {
       task: updatedTask,
     });
@@ -90,13 +90,9 @@ const App = () => {
   const handleDeleteTask = async (index: any) => {
     setModalVisible(!modalVisible)
 
-    //finding the index to facilitate deletion
-    let obj = tasks.find((o: any) => o.id == index);
-    const tempIndex = tasks.indexOf(obj);
+    const {tempArray} = useFetchTaskDetails(tasks, index).deleteOperation()
 
-    //deleting the data locally
-    let tempArray = [...tasks]
-    tempArray.splice(tempIndex, 1);
+    //updating the list in the app
     setTasks(tempArray)
 
     //deleting the data from databse
@@ -105,7 +101,7 @@ const App = () => {
 
   return (
     <View style={styles.rootView} >
-      <Text style={styles.topHeading} >  Enter a task </Text>
+      <Text style={styles.topHeading} >Enter a task</Text>
       <TextInput
         style={styles.input}
         placeholder={'Enter your task here'}
