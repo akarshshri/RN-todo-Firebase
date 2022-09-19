@@ -9,12 +9,13 @@ import {
   View,
 } from 'react-native';
 import { initializeApp } from 'firebase/app';
-import { getFirestore, collection, getDocs, setDoc, doc, updateDoc, deleteDoc } from "firebase/firestore";
+import { getFirestore, collection, getDocs, setDoc, doc, updateDoc, deleteDoc, QueryDocumentSnapshot } from "firebase/firestore";
 import TaskEditModal from './components/TaskEditModal';
 import { useFetchTaskDetails } from './components/Custom Hooks/useFetchTaskDetails';
+import { task } from './components/Custom Hooks/Interfaces/Tasks';
 
 const App = () => {
-  const [tasks, setTasks] = useState<any>([])
+  const [tasks, setTasks] = useState<task>([])
   const [input, setInput] = useState("")
   const [modalVisible, setModalVisible] = useState(false);
   const [taskIndex, setTaskIndex] = useState(0);
@@ -40,10 +41,12 @@ const App = () => {
     getData()
   }, [])
 
+
   const getData = async () => {
-    let temp: object[] = []
+    let temp: task = []
     const querySnapshot = await getDocs(collection(db, dbname));
-    querySnapshot.forEach((doc: any) => {
+    querySnapshot.forEach((doc: QueryDocumentSnapshot) => {
+      console.log(doc)
       if (doc.data().task !== ("" || null || undefined))
         temp.push({ task: doc.data().task, id: doc.id })
     });
@@ -73,7 +76,7 @@ const App = () => {
     setModalVisible(!modalVisible)
   }
 
-  const handleUpdatedTask = async (updatedTask: string, index: any) => {
+  const handleUpdatedTask = async (updatedTask: string, index: number) => {
     setModalVisible(!modalVisible)
 
     const {tempArray} = useFetchTaskDetails(tasks, index).updateOperation(updatedTask)
@@ -87,7 +90,7 @@ const App = () => {
     });
 
   }
-  const handleDeleteTask = async (index: any) => {
+  const handleDeleteTask = async (index: number) => {
     setModalVisible(!modalVisible)
 
     const {tempArray} = useFetchTaskDetails(tasks, index).deleteOperation()

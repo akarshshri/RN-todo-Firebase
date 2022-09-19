@@ -1,13 +1,13 @@
+import { task } from "./Interfaces/Tasks";
+
+type functionType = {
+  tempArray: task,
+  tempIndex: number
+}
 
 interface ReturnType {
-  updateOperation: (updatedTask: string) => {
-    tempArray: object[],
-    tempIndex: number
-  },
-  deleteOperation: () => {
-    tempArray: object[],
-    tempIndex: number
-  },
+  updateOperation: (updatedTask: string) => functionType,
+  deleteOperation: () => functionType,
 }
 
 interface PropType {
@@ -15,10 +15,10 @@ interface PropType {
   index: number
 }
 
-export const useFetchTaskDetails = (tasks: object[], index: number): ReturnType => {
+export const useFetchTaskDetails = (tasks: task, index: number): ReturnType => {
 
-  let obj = tasks.find((o: any) => o.id == index);
-  if(obj == undefined) obj = {}
+  let obj = tasks.find(o => o.id == index);
+  if(obj == undefined) obj = {task: 'NA', id: -1}
     var tempIndex = tasks.indexOf(obj);
   let tempArray = [...tasks]
 
